@@ -18,10 +18,10 @@ from data_io import str_to_bool
 from dnn_models import MLP
 from dnn_models import SincNet as CNN
 
-IS_DATA_PARALLEL = False
-DEVICE_IDS = [0]
-# IS_DATA_PARALLEL = True
-# DEVICE_IDS = list(range(8))
+# IS_DATA_PARALLEL = False
+# DEVICE_IDS = [0]
+IS_DATA_PARALLEL = True
+DEVICE_IDS = list(range(4))
 device = torch.device(f'cuda:{DEVICE_IDS[0]}')
 
 LABEL_SAME_CLASS = 0
@@ -214,7 +214,7 @@ optimizer_DNN1 = optim.RMSprop(DNN1_net.parameters(), lr=lr, alpha=0.95, eps=1e-
 def calc_loss(xs, ys, labels):
   dw = torch.norm((xs - ys), p=2, dim=1)
   ls = dw ** 2 / 2
-  ld = torch.max(M - dw, torch.zeros(dw.shape, dtype=torch.float32).cuda(device))
+  ld = torch.max(M - dw, torch.zeros(dw.shape, dtype=torch.float32, device=device))
   ld = ld ** 2 / 2
   loss = (1 - labels) * ls + labels * ld
   loss = torch.mean(loss)
@@ -227,7 +227,7 @@ train_data_set = Dataset(
   wlen=wlen,
   fact_amp=0.2,
   max_samples=None)
-train_data_loader = DataLoader(train_data_set, batch_size=batch_size)
+train_data_loader = DataLoader(train_data_set, batch_size=batch_size, num_workers=5)
 train_data_iter = train_data_loader.__iter__()
 for epoch in range(N_epochs):
   epoch_start = time.monotonic()
