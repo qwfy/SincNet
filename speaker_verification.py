@@ -76,7 +76,7 @@ class Dataset(IterableDataset):
 
     rand_amp = np.random.uniform(1.0 - self.fact_amp, 1 + self.fact_amp)
     chunk = signal[snt_beg:snt_end] * rand_amp
-    chunk = torch.from_numpy(chunk).float().cuda(device)
+    chunk = chunk.astype(np.float32)
     return chunk
 
   def __next__(self):
@@ -239,7 +239,9 @@ for epoch in range(N_epochs):
 
   for i in range(N_batches):
     part_a, part_b, labels = next(train_data_iter)
-    labels = labels.float().cuda()
+    part_a = part_a.cuda(device)
+    part_b = part_b.cuda(device)
+    labels = labels.float().cuda(device)
     vectors_a = DNN1_net(CNN_net(part_a))
     vectors_b = DNN1_net(CNN_net(part_b))
 
@@ -273,7 +275,9 @@ for epoch in range(N_epochs):
         max_samples=samples_to_eval)
       eval_data_loader = DataLoader(eval_data_set, batch_size=batch_size)
       for part_a, part_b, labels in eval_data_loader:
-        labels = labels.float().cuda()
+        part_a = part_a.cuda(device)
+        part_b = part_b.cuda(device)
+        labels = labels.float().cuda(device)
         vectors_a = DNN1_net(CNN_net(part_a))
         vectors_b = DNN1_net(CNN_net(part_b))
         loss = calc_loss(vectors_a, vectors_b, labels)
