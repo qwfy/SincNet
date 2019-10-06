@@ -3,3 +3,6 @@ analytics = false
 ['remote "timit"']
 url = s3://timit/raw
 endpointurl = http://192.168.3.42:9000
+['remote "timit_prepared_original"']
+url = s3://timit/prepared/original
+endpointurl = http://192.168.3.42:9000
