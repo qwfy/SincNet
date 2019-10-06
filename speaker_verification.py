@@ -282,11 +282,10 @@ for epoch in range(N_epochs):
 
     stat += f' loss_te={loss_te:.4f}'
 
-    with open(os.path.join(output_folder, 'res.res'), 'a') as res_file:
-      res_file.write(stat + '\n')
-
     checkpoint = {'CNN_model_par': CNN_net.state_dict(),
                   'DNN1_model_par': DNN1_net.state_dict()}
     torch.save(checkpoint, os.path.join(output_folder, f'model_raw_{epoch:03d}.pkl'))
 
+  with open(os.path.join(output_folder, 'res.res'), 'a') as res_file:
+    res_file.write(stat + '\n')
   print(stat)
