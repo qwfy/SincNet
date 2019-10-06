@@ -1,14 +1,4 @@
-# speaker_id.py
-# Mirco Ravanelli
-# Mila - University of Montreal
-
-# July 2018
-
-# Description:
-# This code performs a speaker_id experiments with SincNet.
-
-# How to run it:
-# python speaker_id.py --cfg=cfg/SincNet_TIMIT.cfg
+# python speaker_verification.py --cfg=cfg/SincNet_TIMIT.cfg
 
 import os
 import time
@@ -97,15 +87,6 @@ fc_use_batchnorm = list(map(str_to_bool, options.fc_use_batchnorm.split(',')))
 fc_use_laynorm = list(map(str_to_bool, options.fc_use_laynorm.split(',')))
 fc_act = list(map(str, options.fc_act.split(',')))
 
-# [class]
-class_lay = list(map(int, options.class_lay.split(',')))
-class_drop = list(map(float, options.class_drop.split(',')))
-class_use_laynorm_inp = str_to_bool(options.class_use_laynorm_inp)
-class_use_batchnorm_inp = str_to_bool(options.class_use_batchnorm_inp)
-class_use_batchnorm = list(map(str_to_bool, options.class_use_batchnorm.split(',')))
-class_use_laynorm = list(map(str_to_bool, options.class_use_laynorm.split(',')))
-class_act = list(map(str, options.class_act.split(',')))
-
 # [optimization]
 lr = float(options.lr)
 batch_size = int(options.batch_size)
@@ -122,11 +103,7 @@ snt_tr = len(wav_lst_tr)
 wav_lst_te = ReadList(te_lst)
 snt_te = len(wav_lst_te)
 
-# Folder creation
-try:
-  os.stat(output_folder)
-except:
-  os.mkdir(output_folder)
+os.makedirs(output_folder, exist_ok=True)
 
 # setting seed
 torch.manual_seed(seed)
@@ -150,8 +127,7 @@ CNN_arch = {'input_dim': wlen,
             'cnn_use_laynorm': cnn_use_laynorm,
             'cnn_use_batchnorm': cnn_use_batchnorm,
             'cnn_act': cnn_act,
-            'cnn_drop': cnn_drop,
-            }
+            'cnn_drop': cnn_drop}
 
 CNN_net = CNN(CNN_arch)
 CNN_net_out_dim = CNN_net.out_dim
@@ -169,28 +145,12 @@ DNN1_arch = {'input_dim': CNN_net_out_dim,
              'fc_use_laynorm': fc_use_laynorm,
              'fc_use_laynorm_inp': fc_use_laynorm_inp,
              'fc_use_batchnorm_inp': fc_use_batchnorm_inp,
-             'fc_act': fc_act,
-             }
+             'fc_act': fc_act}
 
 DNN1_net = MLP(DNN1_arch)
 if IS_DATA_PARALLEL:
   DNN1_net = nn.DataParallel(DNN1_net, device_ids=DEVICE_IDS)
 DNN1_net.cuda(device)
-
-DNN2_arch = {'input_dim': fc_lay[-1],
-             'fc_lay': class_lay,
-             'fc_drop': class_drop,
-             'fc_use_batchnorm': class_use_batchnorm,
-             'fc_use_laynorm': class_use_laynorm,
-             'fc_use_laynorm_inp': class_use_laynorm_inp,
-             'fc_use_batchnorm_inp': class_use_batchnorm_inp,
-             'fc_act': class_act,
-             }
-
-DNN2_net = MLP(DNN2_arch)
-if IS_DATA_PARALLEL:
-  DNN2_net = nn.DataParallel(DNN2_net, device_ids=DEVICE_IDS)
-DNN2_net.cuda(device)
 
 if pt_file != 'none':
   checkpoint_load = torch.load(pt_file)
