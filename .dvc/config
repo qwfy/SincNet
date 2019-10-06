@@ -1,2 +1,5 @@
 [core]
 analytics = false
+['remote "timit"']
+url = s3://timit/raw
+endpointurl = http://192.168.3.42:9000

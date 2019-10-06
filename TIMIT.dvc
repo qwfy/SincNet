@@ -1,0 +1,6 @@
+md5: aeb44b0441bf5c660cd17a2026dc1814
+outs:
+- cache: true
+  md5: 110a15671791a2ec7c358938becefb8b.dir
+  metric: false
+  path: TIMIT
